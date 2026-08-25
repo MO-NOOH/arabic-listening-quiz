@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arabic Listening Challenge — Alif Madd, و & ف</title>
+  <style>
+    :root {
+      --bg1: #fff7d6;
+      --bg2: #e8f6ff;
+      --card: #ffffff;
+      --ink: #213547;
+      --muted: #607080;
+      --primary: #6c63ff;
+      --primary-dark: #5148e5;
+      --accent: #ffb703;
+      --good: #2eaf62;
+      --good-bg: #e8f8ee;
+      --bad: #df3e4f;
+      --bad-bg: #ffe9ec;
+      --line: #dce6ef;
+      --shadow: 0 14px 35px rgba(34, 61, 89, .13);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,183,3,.20), transparent 28%),
+        radial-gradient(circle at 90% 15%, rgba(108,99,255,.14), transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      padding: 22px 12px;
+    }
+
+    .app {
+      width: min(900px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.7rem, 4.5vw, 2.7rem);
+      line-height: 1.1;
+    }
+
+    .hero p {
+      margin: 0 auto;
+      max-width: 700px;
+      color: var(--muted);
+      font-size: clamp(.95rem, 2.4vw, 1.08rem);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin: 18px 0 12px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-weight: 800;
+    }
+
+    .pill {
+      background: rgba(255,255,255,.84);
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 999px;
+      padding: 8px 13px;
+      box-shadow: 0 4px 14px rgba(40,60,80,.07);
+    }
+
+    .mini-restart {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 13px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 4px 14px rgba(40,60,80,.08);
+    }
+
+    .progress-track {
+      height: 15px;
+      background: rgba(255,255,255,.8);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(108,99,255,.12);
+      margin-bottom: 16px;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ffb703, #ff7b00, #6c63ff);
+      transition: width .35s ease;
+      border-radius: inherit;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 26px;
+      padding: clamp(18px, 4vw, 32px);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(108,99,255,.09);
+    }
+
+    .instruction {
+      text-align: center;
+      font-size: 1.02rem;
+      color: var(--muted);
+      margin: 0 0 16px;
+      font-weight: 700;
+    }
+
+    .listen-btn {
+      display: block;
+      width: min(470px, 100%);
+      margin: 0 auto 24px;
+      border: 0;
+      border-radius: 20px;
+      padding: 18px 20px;
+      font-size: clamp(1.15rem, 3vw, 1.5rem);
+      font-weight: 900;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      box-shadow: 0 10px 22px rgba(108,99,255,.28);
+      transition: transform .12s ease, filter .12s ease;
+    }
+
+    .listen-btn:hover { filter: brightness(1.04); }
+    .listen-btn:active { transform: translateY(2px) scale(.99); }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .option {
+      min-height: 105px;
+      border: 3px solid var(--line);
+      border-radius: 20px;
+      background: #fbfdff;
+      cursor: pointer;
+      padding: 10px 14px;
+      font-family: "Noto Naskh Arabic", "Amiri", "Scheherazade New", "Traditional Arabic", serif;
+      font-size: clamp(2.2rem, 8vw, 4.25rem);
+      font-weight: 700;
+      line-height: 1.55;
+      direction: rtl;
+      text-align: center;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      overflow-wrap: anywhere;
+    }
+
+    .option:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-color: #aea9ff;
+      background: #f7f6ff;
+    }
+
+    .option:disabled { cursor: default; opacity: 1; }
+
+    .option.correct {
+      border-color: var(--good);
+      background: var(--good-bg);
+      color: #145f33;
+    }
+
+    .option.wrong {
+      border-color: var(--bad);
+      background: var(--bad-bg);
+      color: #9d1728;
+    }
+
+    .feedback {
+      margin-top: 20px;
+      border-radius: 18px;
+      padding: 16px;
+      display: none;
+      background: #f7fafc;
+      border: 1px solid var(--line);
+    }
+
+    .feedback.show { display: block; }
+
+    .feedback-title {
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .answer-row {
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 7px 0;
+      font-weight: 800;
+    }
+
+    .arabic-answer {
+      direction: rtl;
+      font-family: "Noto Naskh Arabic", "Amiri", "Scheherazade New", "Traditional Arabic", serif;
+      font-size: 2rem;
+      line-height: 1.5;
+    }
+
+    .tip {
+      margin: 12px auto 0;
+      max-width: 650px;
+      text-align: center;
+      background: #fff8d9;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 700;
+      color: #6b5511;
+    }
+
+    .next-btn, .restart-btn {
+      display: block;
+      width: min(430px, 100%);
+      margin: 16px auto 0;
+      border: 0;
+      border-radius: 17px;
+      padding: 15px 18px;
+      cursor: pointer;
+      font-size: 1.08rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffb703, #ff8c00);
+      color: #3b2b00;
+      box-shadow: 0 8px 18px rgba(255,153,0,.23);
+    }
+
+    .next-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .end-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .end-screen.show { display: block; }
+    .quiz-screen.hide { display: none; }
+
+    .big-score {
+      font-size: clamp(2rem, 8vw, 4rem);
+      font-weight: 1000;
+      margin: 10px 0 2px;
+      color: var(--primary);
+    }
+
+    .arabic-praise {
+      font-family: "Noto Naskh Arabic", "Amiri", "Scheherazade New", serif;
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      line-height: 1.55;
+      direction: rtl;
+      margin: 12px 0;
+      font-weight: 700;
+    }
+
+    .review-note {
+      max-width: 650px;
+      margin: 0 auto 16px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .sound-note {
+      margin-top: 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 620px) {
+      body { padding: 12px 8px; }
+      .options { grid-template-columns: 1fr; }
+      .option { min-height: 86px; font-size: clamp(2.4rem, 13vw, 3.7rem); }
+      .topbar { grid-template-columns: 1fr; }
+      .mini-restart { justify-self: end; }
+      .card { border-radius: 20px; padding: 17px 12px; }
+      .listen-btn { margin-bottom: 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <h1>🎧 Arabic Listening Challenge</h1>
+      <p>Listen carefully. Can you hear the difference between short <strong>a</strong> and long <strong>ā</strong>, and between <strong>و</strong> and <strong>ف</strong>?</p>
+    </section>
+
+    <div class="topbar">
+      <div class="stats">
+        <div class="pill" id="questionCounter">Question 1/30</div>
+        <div class="pill" id="scoreCounter">Score: 0</div>
+      </div>
+      <button class="mini-restart" id="miniRestart" type="button">↻ Restart</button>
+    </div>
+
+    <div class="progress-track" aria-label="Quiz progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="card">
+      <div class="quiz-screen" id="quizScreen">
+        <p class="instruction">Press the button, listen carefully, then choose the word you heard.</p>
+
+        <button class="listen-btn" id="listenBtn" type="button" aria-label="Listen to the Arabic word">
+          🔊 Listen to the word
+        </button>
+
+        <div class="options" id="options"></div>
+
+        <div class="feedback" id="feedback" aria-live="polite">
+          <div class="feedback-title" id="feedbackTitle"></div>
+          <div class="answer-row">
+            <span>Your answer:</span>
+            <span class="arabic-answer" id="yourAnswer"></span>
+          </div>
+          <div class="answer-row">
+            <span>Correct answer:</span>
+            <span class="arabic-answer" id="correctAnswer"></span>
+          </div>
+          <div class="tip" id="tipText"></div>
+        </div>
+
+        <button class="next-btn" id="nextBtn" type="button" disabled>Next question ➜</button>
+        <p class="sound-note">Tip: you can press 🔊 as many times as you need — even after answering.</p>
+      </div>
+
+      <div class="end-screen" id="endScreen">
+        <div style="font-size:3rem">🏆</div>
+        <h2>Quiz complete!</h2>
+        <div class="big-score" id="finalScore"></div>
+        <div id="finalPercentage"></div>
+        <div class="arabic-praise" id="arabicPraise"></div>
+        <p class="review-note" id="reviewNote"></p>
+        <button class="restart-btn" id="restartBtn" type="button">🔄 Restart / Try Again</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // 30 listening questions. Distractors intentionally differ by:
+    // - و ↔ ف
+    // - short fatḥah ↔ long Alif Madd
+    // - one other harakah / tanwin / shaddah / sukun change
+    const QUESTION_BANK = [
+      {
+        word: "بَابٌ",
+        options: ["بَابٌ", "بَبٌ", "بِابٌ", "بَابٍ"],
+        focus: "Listen for the long ā in بَا. Fatḥah alone is short a; بَا is longer."
+      },
+      {
+        word: "نَارٌ",
+        options: ["نَارٌ", "نَرٌ", "نِارٌ", "نَارٍ"],
+        focus: "Compare نَ (na) with نَا (nā). The Alif makes the vowel longer."
+      },
+      {
+        word: "دَارٌ",
+        options: ["دَارٌ", "دَرٌ", "دِارٌ", "دَارٍ"],
+        focus: "Hear the long ā: دَا — not the short دَ."
+      },
+      {
+        word: "مَالٌ",
+        options: ["مَالٌ", "مَلٌ", "مِالٌ", "مَالٍ"],
+        focus: "The first vowel is long: مَا (mā), not مَ (ma)."
+      },
+      {
+        word: "قَالَ",
+        options: ["قَالَ", "قَلَ", "قِالَ", "قَالُ"],
+        focus: "Listen for قَا. Alif Madd stretches the Fatḥah sound."
+      },
+      {
+        word: "وَلَدٌ",
+        options: ["وَلَدٌ", "فَلَدٌ", "وُلِدٌ", "وَلَادٌ"],
+        focus: "Listen to the first sound: وَ starts with Wāw, not Fāʾ."
+      },
+      {
+        word: "وَرَقٌ",
+        options: ["وَرَقٌ", "فَرَقٌ", "وُرَقٌ", "وَرَاقٌ"],
+        focus: "The first consonant is و. Compare the softer /w/ with ف /f/."
+      },
+      {
+        word: "فَمٌ",
+        options: ["فَمٌ", "وَمٌ", "فَامٌ", "فِمٌ"],
+        focus: "Listen for ف /f/. One option changes it to و /w/ and another lengthens a to ā."
+      },
+      {
+        word: "فَرَسٌ",
+        options: ["فَرَسٌ", "وَرَسٌ", "فَارَسٌ", "فُرَسٌ"],
+        focus: "Listen for initial فَ (fa), not وَ (wa), and not فَا (fā)."
+      },
+      {
+        word: "كَاتِبٌ",
+        options: ["كَاتِبٌ", "كَتِبٌ", "كِاتِبٌ", "كَاتِبٍ"],
+        focus: "Hear the long كَا (kā), then the short Kasrah in تِ."
+      },
+      {
+        word: "وَاحِدٌ",
+        options: ["وَاحِدٌ", "فَاحِدٌ", "وَحِدٌ", "وَاحُدٌ"],
+        focus: "Two details matter: initial و and long وَا (wā)."
+      },
+      {
+        word: "فَاتِحٌ",
+        options: ["فَاتِحٌ", "وَاتِحٌ", "فَتِحٌ", "فَاتَحٌ"],
+        focus: "Listen for فَا (fā): Fāʾ plus a long ā."
+      },
+      {
+        word: "وَالِدٌ",
+        options: ["وَالِدٌ", "فَالِدٌ", "وَلِدٌ", "وَالَدٌ"],
+        focus: "The word begins وَالِ: Wāw + long ā + Kasrah."
+      },
+      {
+        word: "وَاسِعٌ",
+        options: ["وَاسِعٌ", "فَاسِعٌ", "وَسِعٌ", "وَاسَعٌ"],
+        focus: "Listen for long وَا and the Kasrah on سِ."
+      },
+      {
+        word: "فَارِسٌ",
+        options: ["فَارِسٌ", "وَارِسٌ", "فَرِسٌ", "فَارَسٌ"],
+        focus: "Hear فَا (fā), not وَ (wa), and keep the Kasrah in رِ."
+      },
+      {
+        word: "فَاكِهَةٌ",
+        options: ["فَاكِهَةٌ", "وَاكِهَةٌ", "فَكِهَةٌ", "فَاكَهَةٌ"],
+        focus: "Listen for initial فَا (fā) and the short Kasrah كِ."
+      },
+      {
+        word: "مِفْتَاحٌ",
+        options: ["مِفْتَاحٌ", "مِوْتَاحٌ", "مِفْتَحٌ", "مَفْتَاحٌ"],
+        focus: "Listen inside the word: مِفْ has Fāʾ with Sukūn, then تَا has long ā."
+      },
+      {
+        word: "سَافَرَ",
+        options: ["سَافَرَ", "سَفَرَ", "سَاوَرَ", "سَافِرَ"],
+        focus: "Hear the long سَا and then the consonant ف in the middle."
+      },
+      {
+        word: "وَقَفَ",
+        options: ["وَقَفَ", "فَقَفَ", "وَقَوَ", "وَقَافَ"],
+        focus: "Both target letters appear: و at the start and ف at the end."
+      },
+      {
+        word: "مَوْزٌ",
+        options: ["مَوْزٌ", "مَفْزٌ", "مَوَزٌ", "مَازٌ"],
+        focus: "Listen for وْ inside the word. Sukūn makes it part of the consonant/diphthong sound."
+      },
+      {
+        word: "خَوْفٌ",
+        options: ["خَوْفٌ", "خَفْفٌ", "خَوْوٌ", "خَافٌ"],
+        focus: "This one contains both و and ف. Listen closely to خَوْف."
+      },
+      {
+        word: "فَوْزٌ",
+        options: ["فَوْزٌ", "وَوْزٌ", "فَفْزٌ", "فَازٌ"],
+        focus: "Hear initial ف, then وْ. Do not confuse the two letters."
+      },
+      {
+        word: "وَفَاءٌ",
+        options: ["وَفَاءٌ", "فَفَاءٌ", "وَفَأٌ", "وَفَاءِ"],
+        focus: "Listen for وَفَا: Wāw, then Fāʾ, then a long ā."
+      },
+      {
+        word: "فَوَاكِهُ",
+        options: ["فَوَاكِهُ", "وَوَاكِهُ", "فَفَاكِهُ", "فَوَكِهُ"],
+        focus: "A harder sequence: فَ + وَ + long ا in وَا."
+      },
+      {
+        word: "وَافِرٌ",
+        options: ["وَافِرٌ", "فَافِرٌ", "وَفِرٌ", "وَافَرٌ"],
+        focus: "Hear وَا (wā), then فِ. Both the consonant and vowel length matter."
+      },
+      {
+        word: "مِفْتَاحَانِ",
+        options: ["مِفْتَاحَانِ", "مِوْتَاحَانِ", "مِفْتَحَانِ", "مِفْتَاحَنِ"],
+        focus: "Listen for فْ and two long ā sounds: تَا and حَا."
+      },
+      {
+        word: "سَافَرُوا",
+        options: ["سَافَرُوا", "سَفَرُوا", "سَاوَرُوا", "سَافَرُ"],
+        focus: "Hear long ā in سَا and the ending رُوا."
+      },
+      {
+        word: "وَقَّافٌ",
+        options: ["وَقَّافٌ", "فَقَّافٌ", "وَقَافٌ", "وَقَّفٌ"],
+        focus: "Listen for initial و, Shaddah on قّ, and long ā in قَّا."
+      },
+      {
+        word: "فَوَّازٌ",
+        options: ["فَوَّازٌ", "وَوَّازٌ", "فَوَازٌ", "فَوَّزٌ"],
+        focus: "Hear ف at the start, Shaddah on وّ, and long ā in وَّا."
+      },
+      {
+        word: "مَوَاقِفٌ",
+        options: ["مَوَاقِفٌ", "مَفَاقِفٌ", "مَوَقِفٌ", "مَوَاقِوٌ"],
+        focus: "A challenging one: و appears inside, وَا has long ā, and the final consonant is ف."
+      }
+    ];
+
+    let quiz = [];
+    let index = 0;
+    let score = 0;
+    let answered = false;
+    let selectedArabicVoice = null;
+
+    const questionCounter = document.getElementById("questionCounter");
+    const scoreCounter = document.getElementById("scoreCounter");
+    const progressBar = document.getElementById("progressBar");
+    const optionsEl = document.getElementById("options");
+    const listenBtn = document.getElementById("listenBtn");
+    const feedback = document.getElementById("feedback");
+    const feedbackTitle = document.getElementById("feedbackTitle");
+    const yourAnswer = document.getElementById("yourAnswer");
+    const correctAnswer = document.getElementById("correctAnswer");
+    const tipText = document.getElementById("tipText");
+    const nextBtn = document.getElementById("nextBtn");
+    const quizScreen = document.getElementById("quizScreen");
+    const endScreen = document.getElementById("endScreen");
+    const finalScore = document.getElementById("finalScore");
+    const finalPercentage = document.getElementById("finalPercentage");
+    const arabicPraise = document.getElementById("arabicPraise");
+    const reviewNote = document.getElementById("reviewNote");
+    const restartBtn = document.getElementById("restartBtn");
+    const miniRestart = document.getElementById("miniRestart");
+
+    function shuffle(array) {
+      const a = [...array];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function chooseArabicVoice() {
+      if (!("speechSynthesis" in window)) return;
+      const voices = speechSynthesis.getVoices();
+      const arabic = voices.filter(v => (v.lang || "").toLowerCase().startsWith("ar"));
+      const preferred =
+        arabic.find(v => /saudi|arabic|hoda|maged|laila|tarik|zeina|salma/i.test(v.name)) ||
+        arabic[0] ||
+        null;
+      selectedArabicVoice = preferred;
+    }
+
+    if ("speechSynthesis" in window) {
+      chooseArabicVoice();
+      speechSynthesis.onvoiceschanged = chooseArabicVoice;
+    }
+
+    function speakCurrentWord() {
+      if (!("speechSynthesis" in window)) {
+        alert("Your browser does not support speech synthesis. Try Chrome, Edge, Safari, or another modern browser.");
+        return;
+      }
+      const item = quiz[index];
+      if (!item) return;
+
+      speechSynthesis.cancel();
+
+      // Arabic harakat remain in the utterance to improve pronunciation where supported.
+      const utterance = new SpeechSynthesisUtterance(item.word);
+      utterance.lang = selectedArabicVoice?.lang || "ar-SA";
+      if (selectedArabicVoice) utterance.voice = selectedArabicVoice;
+      utterance.rate = 0.72;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      speechSynthesis.speak(utterance);
+    }
+
+    function startQuiz() {
+      speechSynthesis?.cancel?.();
+      quiz = shuffle(QUESTION_BANK).map(q => ({
+        ...q,
+        shuffledOptions: shuffle(q.options)
+      }));
+      index = 0;
+      score = 0;
+      answered = false;
+      quizScreen.classList.remove("hide");
+      endScreen.classList.remove("show");
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const item = quiz[index];
+      answered = false;
+      feedback.classList.remove("show");
+      nextBtn.disabled = true;
+      optionsEl.innerHTML = "";
+
+      questionCounter.textContent = `Question ${index + 1}/30`;
+      scoreCounter.textContent = `Score: ${score}`;
+      progressBar.style.width = `${(index / 30) * 100}%`;
+
+      item.shuffledOptions.forEach(optionText => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option";
+        btn.textContent = optionText;
+        btn.setAttribute("aria-label", `Answer option ${optionText}`);
+        btn.addEventListener("click", () => selectAnswer(optionText, btn));
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(choice, clickedButton) {
+      if (answered) return;
+      answered = true;
+
+      const item = quiz[index];
+      const correct = choice === item.word;
+      if (correct) score++;
+
+      [...optionsEl.children].forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === item.word) btn.classList.add("correct");
+      });
+
+      if (!correct) clickedButton.classList.add("wrong");
+
+      feedbackTitle.textContent = correct
+        ? "✅ Correct! Great listening!"
+        : "❌ Not quite — listen again and compare.";
+
+      yourAnswer.textContent = choice;
+      correctAnswer.textContent = item.word;
+      tipText.textContent = item.focus + " Remember: short Fatḥah = a, while Fatḥah + Alif Madd = ā.";
+      feedback.classList.add("show");
+
+      scoreCounter.textContent = `Score: ${score}`;
+      progressBar.style.width = `${((index + 1) / 30) * 100}%`;
+      nextBtn.disabled = false;
+      nextBtn.textContent = index === 29 ? "See my result 🏆" : "Next question ➜";
+    }
+
+    function nextQuestion() {
+      if (!answered) return;
+      if (index < quiz.length - 1) {
+        index++;
+        renderQuestion();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      speechSynthesis?.cancel?.();
+      quizScreen.classList.add("hide");
+      endScreen.classList.add("show");
+      questionCounter.textContent = "Finished";
+      scoreCounter.textContent = `Score: ${score}`;
+      progressBar.style.width = "100%";
+
+      const percent = Math.round((score / 30) * 100);
+      finalScore.textContent = `${score} / 30`;
+      finalPercentage.textContent = `${percent}%`;
+
+      if (score >= 27) {
+        arabicPraise.textContent = "مُمْتَاز! ⭐⭐⭐";
+        reviewNote.textContent = "Excellent listening! You are hearing the difference between short a / long ā and و / ف very clearly.";
+      } else if (score >= 23) {
+        arabicPraise.textContent = "جَيِّدٌ جِدًّا! ⭐⭐";
+        reviewNote.textContent = "Very good! Replay the hardest words and pay special attention to vowel length.";
+      } else if (score >= 18) {
+        arabicPraise.textContent = "جَيِّدٌ! ⭐";
+        reviewNote.textContent = "Good work. Try again and listen for whether the sound is short a or stretched ā, and whether you hear /w/ or /f/.";
+      } else {
+        arabicPraise.textContent = "حَاوِلْ مَرَّةً أُخْرَى!";
+        reviewNote.textContent = "Try again. Use the replay button often and compare each sound slowly.";
+      }
+    }
+
+    listenBtn.addEventListener("click", speakCurrentWord);
+    nextBtn.addEventListener("click", nextQuestion);
+    restartBtn.addEventListener("click", startQuiz);
+    miniRestart.addEventListener("click", startQuiz);
+
+    startQuiz();
+  </script>
+</body>
+</html>
