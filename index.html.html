@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#6842d9">
+  <title>Arabic Sound Stars — Alif Madd, Wāw & Fāʾ</title>
+  <style>
+    :root{--purple:#6842d9;--pink:#ff6ca8;--blue:#22a9e8;--yellow:#ffd65a;--ink:#292348;--green:#23a96e;--red:#e34c57;--paper:#fff;--muted:#6f6984}
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 8% 8%,#fff1a9 0 5%,transparent 5.2%),radial-gradient(circle at 92% 13%,#ffcce1 0 7%,transparent 7.2%),linear-gradient(145deg,#efeaff,#e7f8ff);padding:18px}
+    button{font:inherit} .app{width:min(760px,100%);margin:auto}.title{text-align:center;margin:4px 0 14px}.title h1{font-size:clamp(1.5rem,5vw,2.35rem);margin:0}.title p{margin:5px;color:var(--muted);font-weight:650}
+    .card{background:rgba(255,255,255,.96);border-radius:28px;padding:clamp(17px,4vw,30px);box-shadow:0 16px 42px rgba(63,42,124,.15);border:3px solid #fff}
+    .top{display:flex;justify-content:space-between;gap:10px;font-weight:800}.pill{background:#f0ebff;border-radius:999px;padding:8px 13px}.score{background:#e3f7ff}.track{height:14px;background:#e9e5f1;border-radius:999px;margin:14px 0 22px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--yellow),var(--blue));border-radius:inherit;transition:width .35s}
+    .hint{text-align:center;font-weight:750;color:var(--muted);margin:0 0 12px}.listen{display:block;width:min(420px,100%);margin:0 auto 22px;border:0;border-radius:20px;padding:18px 20px;color:white;background:linear-gradient(135deg,var(--purple),#9269ef);font-size:clamp(1.15rem,4vw,1.5rem);font-weight:900;box-shadow:0 7px 0 #4c2fac;cursor:pointer}.listen:active{transform:translateY(4px);box-shadow:0 3px 0 #4c2fac}.listen.speaking{animation:pulse .65s infinite alternate}@keyframes pulse{to{filter:brightness(1.18);transform:scale(1.02)}}
+    .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;direction:rtl}.choice{min-height:92px;border:3px solid #ded8ee;background:#fff;border-radius:20px;font-family:"Noto Naskh Arabic","Traditional Arabic","Amiri",serif;font-size:clamp(2.15rem,8vw,3.45rem);line-height:1.5;padding:7px 10px;cursor:pointer;color:var(--ink);box-shadow:0 5px 0 #ded8ee}.choice:hover:not(:disabled),.choice:focus-visible:not(:disabled){border-color:var(--blue);transform:translateY(-2px)}.choice:disabled{cursor:default;opacity:1}.choice.correct{background:#dff8eb;border-color:var(--green);box-shadow:0 5px 0 #168652}.choice.wrong{background:#ffe5e7;border-color:var(--red);box-shadow:0 5px 0 #bd3944}
+    .feedback{margin-top:20px;border-radius:18px;padding:15px;background:#f6f3ff;display:none}.feedback.show{display:block}.verdict{font-weight:900;font-size:1.18rem;margin-bottom:8px}.answer-lines{display:grid;gap:5px}.arabic-inline{font-family:"Noto Naskh Arabic","Traditional Arabic",serif;font-size:1.65rem;direction:rtl;display:inline-block}.tip{color:#58516e;margin:8px 0 0}.next,.restart{display:none;width:100%;border:0;border-radius:18px;background:var(--blue);color:white;padding:15px;font-size:1.15rem;font-weight:900;margin-top:16px;cursor:pointer;box-shadow:0 5px 0 #1281af}.next.show{display:block}.end{text-align:center;display:none}.end.show{display:block}.end .big{font-size:clamp(2.5rem,10vw,4rem);margin:5px}.end .arabic-result{font:900 clamp(2rem,8vw,3.5rem)/1.5 "Noto Naskh Arabic","Traditional Arabic",serif;color:var(--purple)}.restart{display:block;background:linear-gradient(135deg,var(--pink),#ff8b59);box-shadow:0 5px 0 #ca4a6d}.tiny{text-align:center;color:var(--muted);font-size:.85rem;margin:14px 0 0}
+    @media(max-width:520px){body{padding:10px}.card{border-radius:22px}.choices{grid-template-columns:1fr;gap:11px}.choice{min-height:72px}.title p{font-size:.9rem}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="title"><h1>🌟 Arabic Sound Stars 🌟</h1><p>Listen carefully: short <b>a</b>, long <b>ā</b>, Wāw و, or Fāʾ ف?</p></header>
+  <section class="card" id="quiz">
+    <div class="top"><span class="pill" id="counter">Question 1/30</span><span class="pill score" id="score">Score: 0</span></div>
+    <div class="track" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="30"><div class="bar" id="bar"></div></div>
+    <p class="hint">Listen first. The hidden word will only appear after you answer.</p>
+    <button class="listen" id="listen" type="button" aria-label="Listen to the hidden Arabic word">🔊 Listen to the word</button>
+    <div class="choices" id="choices"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <button class="next" id="next" type="button">Next question ➜</button>
+  </section>
+  <section class="card end" id="end" aria-live="polite">
+    <div class="big">🏆</div><h2>Quiz complete!</h2><div class="arabic-result" id="resultArabic"></div><h3 id="resultScore"></h3><p id="resultMessage"></p>
+    <button class="restart" id="restart" type="button">🔄 Restart / Try Again</button>
+  </section>
+  <p class="tiny">No account or personal information needed. Audio uses your device's built-in Arabic voice.</p>
+</main>
+<script>
+"use strict";
+const bank=[
+ {w:"بَابٌ",o:["بَبٌ","بِابٌ","بَابٍ"]},{w:"نَارٌ",o:["نَرٌ","نِارٌ","نَارٍ"]},
+ {w:"دَارٌ",o:["دَرٌ","دُارٌ","دَارٍ"]},{w:"مَالٌ",o:["مَلٌ","مِالٌ","مَالٍ"]},
+ {w:"قَالَ",o:["قَلَ","قِالَ","قَالُ"]},{w:"وَلَدٌ",o:["فَلَدٌ","وَالَدٌ","وُلِدٌ"]},
+ {w:"وَرَقٌ",o:["فَرَقٌ","وَارَقٌ","وُرَقٌ"]},{w:"فَمٌ",o:["وَمٌ","فَامٌ","فَمٍ"]},
+ {w:"فَرَسٌ",o:["وَرَسٌ","فَارَسٌ","فَرِسٌ"]},{w:"وَاحِدٌ",o:["فَاحِدٌ","وَحِدٌ","وَاحِدٍ"]},
+ {w:"فَاتِحٌ",o:["وَاتِحٌ","فَتِحٌ","فَاتَحٌ"]},{w:"وَالِدٌ",o:["فَالِدٌ","وَلِدٌ","وَالَدٌ"]},
+ {w:"وَاسِعٌ",o:["فَاسِعٌ","وَسِعٌ","وَاسَعٌ"]},{w:"فَارِسٌ",o:["وَارِسٌ","فَرِسٌ","فَارَسٌ"]},
+ {w:"نَافِعٌ",o:["نَاوِعٌ","نَفِعٌ","نَافَعٌ"]},{w:"مِفْتَاحٌ",o:["مِوْتَاحٌ","مِفْتَحٌ","مَفْتَاحٌ"]},
+ {w:"سَافَرَ",o:["سَاوَرَ","سَفَرَ","سَافِرَ"]},{w:"وَقَفَ",o:["فَقَفَ","وَقَافَ","وَقِفَ"]},
+ {w:"خَوْفٌ",o:["خَفْفٌ","خَافٌ","خَوْفٍ"]},{w:"سَوْفَ",o:["سَفْوَ","سَافَ","سَوْفُ"]},
+ {w:"نَافِذٌ",o:["نَاوِذٌ","نَفِذٌ","نَافَذٌ"]},{w:"حَافِظٌ",o:["حَاوِظٌ","حَفِظٌ","حَافَظٌ"]},
+ {w:"مَوَاقِفُ",o:["مَفَاقِفُ","مَوَقِفُ","مَوَاقَفُ"]},{w:"فَوَاكِهُ",o:["وَوَاكِهُ","فَفَاكِهُ","فَوَكِهُ"]},
+ {w:"عَصَافِيرُ",o:["عَصَاوِيرُ","عَصَفِيرُ","عِصَافِيرُ"]},{w:"مُسَافِرٌ",o:["مُسَاوِرٌ","مُسَفِرٌ","مَسَافِرٌ"]},
+ {w:"فَوَّازٌ",o:["وَوَّازٌ","فَوَزٌ","فَوَّازٍ"]},{w:"وَفَاءٌ",o:["فَوَاءٌ","وَفَأٌ","وِفَاءٌ"]},
+ {w:"مِفْتَاحَانِ",o:["مِوْتَاحَانِ","مِفْتَحَانِ","مِفْتَاحَيْنِ"]},{w:"وَقَفَ فَارِسٌ",o:["فَقَفَ وَارِسٌ","وَقَفَ فَرِسٌ","وَقَافَ فَارِسٌ"]}
+];
+const $=id=>document.getElementById(id); let questions=[],index=0,points=0,answered=false,voice=null;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function pickVoice(){const vs=speechSynthesis.getVoices();voice=vs.find(v=>/^ar(-|_)/i.test(v.lang))||vs.find(v=>/arab/i.test(v.name))||null}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(){if(!("speechSynthesis" in window)){alert("Speech is not supported in this browser. Try Chrome, Edge, or Safari.");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(questions[index].w);u.lang="ar-SA";u.rate=.72;u.pitch=1;u.volume=1;if(voice)u.voice=voice;u.onstart=()=>$("listen").classList.add("speaking");u.onend=u.onerror=()=>$("listen").classList.remove("speaking");speechSynthesis.speak(u)}
+function start(){speechSynthesis?.cancel();questions=shuffle(bank.map(q=>({...q,o:[...q.o]})));index=0;points=0;$("quiz").style.display="block";$("end").classList.remove("show");render()}
+function render(){answered=false;const q=questions[index];$("counter").textContent=`Question ${index+1}/30`;$("score").textContent=`Score: ${points}`;$("bar").style.width=`${index/30*100}%`;$("bar").parentElement.setAttribute("aria-valuenow",index);$("feedback").className="feedback";$("feedback").innerHTML="";$("next").className="next";$("next").textContent=index===29?"See my result 🏆":"Next question ➜";const all=shuffle([q.w,...q.o]);$("choices").innerHTML="";all.forEach(word=>{const b=document.createElement("button");b.type="button";b.className="choice";b.lang="ar";b.dir="rtl";b.textContent=word;b.addEventListener("click",()=>answer(b,word));$("choices").appendChild(b)})}
+function answer(button,word){if(answered)return;answered=true;const q=questions[index],ok=word===q.w;if(ok)points++;[...$("choices").children].forEach(b=>{b.disabled=true;if(b.textContent===q.w)b.classList.add("correct")});if(!ok)button.classList.add("wrong");$("score").textContent=`Score: ${points}`;$("bar").style.width=`${(index+1)/30*100}%`;$("bar").parentElement.setAttribute("aria-valuenow",index+1);$("feedback").innerHTML=`<div class="verdict">${ok?"✅ Correct — well done!":"❌ Good try — listen and compare."}</div><div class="answer-lines"><div>Your answer: <span class="arabic-inline" lang="ar">${word}</span></div><div>Correct answer: <span class="arabic-inline" lang="ar">${q.w}</span></div></div><p class="tip">👂 Compare short Fatḥah <b>“a”</b> with long Alif Madd <b>“ā”</b>. You can replay the word now.</p>`;$("feedback").classList.add("show");$("next").classList.add("show")}
+function finish(){speechSynthesis?.cancel();$("quiz").style.display="none";$("end").classList.add("show");const pct=Math.round(points/30*100);let ar,msg;if(points>=27){ar="مُمْتَاز! ⭐⭐⭐";msg="Amazing listening! You are an Arabic Sound Star!"}else if(points>=23){ar="جَيِّدٌ جِدًّا! ⭐⭐";msg="Very good! Your ears are getting sharper."}else if(points>=18){ar="جَيِّدٌ! ⭐";msg="Good work! Practise the tricky sounds once more."}else{ar="حَاوِلْ مُجَدَّدًا!";msg="Keep going! Replay each word and compare a with ā, and و with ف."}$("resultArabic").textContent=ar;$("resultScore").textContent=`You scored ${points} out of 30 (${pct}%)`;$("resultMessage").textContent=msg;window.scrollTo({top:0,behavior:"smooth"})}
+$("listen").addEventListener("click",speak);$("next").addEventListener("click",()=>{if(!answered)return;if(index<29){index++;render();window.scrollTo({top:0,behavior:"smooth"})}else finish()});$("restart").addEventListener("click",start);start();
+</script>
+</body>
+</html>
