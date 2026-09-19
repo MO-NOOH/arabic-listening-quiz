@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>اختبار السكون</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;font-family:Tahoma,Arial,sans-serif;color:#223;padding:20px}
+.app{max-width:700px;margin:auto;background:#fff;border-radius:22px;padding:28px;box-shadow:0 8px 28px #0001}
+h1{text-align:center;color:#173b63}.meta{display:flex;justify-content:space-between;gap:12px;margin:20px 0}
+.bar{height:10px;background:#e8edf3;border-radius:20px;overflow:hidden}#fill{height:100%;width:0;background:#173b63;transition:.3s}
+.listen{display:block;width:100%;padding:16px;border:0;border-radius:14px;background:#173b63;color:#fff;font-size:20px;cursor:pointer;margin:24px 0}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.opt{padding:18px;border:2px solid #dde4ec;background:#fff;border-radius:14px;font-size:25px;cursor:pointer}
+.opt:hover{background:#f7f9fc}.correct{border-color:#198754!important;background:#e9f7ef!important}.wrong{border-color:#c0392b!important;background:#fdecea!important}
+#feedback{min-height:55px;text-align:center;font-size:18px;font-weight:bold;padding:14px}#next{display:none;margin:auto;padding:12px 28px;border:0;border-radius:12px;background:#173b63;color:#fff;font-size:17px;cursor:pointer}
+.end{text-align:center;padding:25px}@media(max-width:520px){.options{grid-template-columns:1fr}.app{padding:18px}}
+</style></head>
+<body><main class="app">
+<h1>🔊 اختبار السُّكُون</h1>
+<p style="text-align:center">استمع إلى الكلمة، ثم اختر الكلمة التي سمعتها.</p>
+<div class="meta"><span id="progress">السؤال 1 من 30</span><span id="score">النتيجة: 0</span></div>
+<div class="bar"><div id="fill"></div></div>
+<section id="quiz">
+<button class="listen" id="listen">🔊 استمع إلى الكلمة</button>
+<div class="options" id="options"></div><div id="feedback" aria-live="polite"></div>
+<button id="next">السؤال التالي ←</button>
+</section></main>
+<script>
+const questions=[{"word": "مَكْتَب", "options": ["مَكْتَب", "مَكَتَب", "مَكِتَب", "مَكُتَب"]}, {"word": "يَكْتُبُ", "options": ["يَكْتُبُ", "يَكَتُبُ", "يَكِتُبُ", "يَكُتُبُ"]}, {"word": "مَدْرَسَة", "options": ["مَدْرَسَة", "مَدَرَسَة", "مَدِرَسَة", "مَدُرَسَة"]}, {"word": "يَفْتَحُ", "options": ["يَفْتَحُ", "يَفَتَحُ", "يَفِتَحُ", "يَفُتَحُ"]}, {"word": "مِفْتَاح", "options": ["مِفْتَاح", "مِفَتَاح", "مِفِتَاح", "مِفُتَاح"]}, {"word": "يَجْلِسُ", "options": ["يَجْلِسُ", "يَجَلِسُ", "يَجِلِسُ", "يَجُلِسُ"]}, {"word": "مَسْجِد", "options": ["مَسْجِد", "مَسَجِد", "مَسِجِد", "مَسُجِد"]}, {"word": "يَشْرَبُ", "options": ["يَشْرَبُ", "يَشَرَبُ", "يَشِرَبُ", "يَشُرَبُ"]}, {"word": "أَخْضَر", "options": ["أَخْضَر", "أَخَضَر", "أَخِضَر", "أَخُضَر"]}, {"word": "نَجْم", "options": ["نَجْم", "نَجَم", "نَجِم", "نَجُم"]}, {"word": "بَحْر", "options": ["بَحْر", "بَحَر", "بَحِر", "بَحُر"]}, {"word": "شَمْس", "options": ["شَمْس", "شَمَس", "شَمِس", "شَمُس"]}, {"word": "قَمْر", "options": ["قَمْر", "قَمَر", "قَمِر", "قَمُر"]}, {"word": "نَهْر", "options": ["نَهْر", "نَهَر", "نَهِر", "نَهُر"]}, {"word": "زَهْر", "options": ["زَهْر", "زَهَر", "زَهِر", "زَهُر"]}, {"word": "يَذْهَبُ", "options": ["يَذْهَبُ", "يَذَهَبُ", "يَذِهَبُ", "يَذُهَبُ"]}, {"word": "يَلْعَبُ", "options": ["يَلْعَبُ", "يَلَعَبُ", "يَلِعَبُ", "يَلُعَبُ"]}, {"word": "يَسْمَعُ", "options": ["يَسْمَعُ", "يَسَمَعُ", "يَسِمَعُ", "يَسُمَعُ"]}, {"word": "يَرْكَبُ", "options": ["يَرْكَبُ", "يَرَكَبُ", "يَرِكَبُ", "يَرُكَبُ"]}, {"word": "يَرْسُمُ", "options": ["يَرْسُمُ", "يَرَسُمُ", "يَرِسُمُ", "يَرُسُمُ"]}, {"word": "أَرْنَب", "options": ["أَرْنَب", "أَرَنَب", "أَرِنَب", "أَرُنَب"]}, {"word": "ثَعْلَب", "options": ["ثَعْلَب", "ثَعَلَب", "ثَعِلَب", "ثَعُلَب"]}, {"word": "مَلْعَب", "options": ["مَلْعَب", "مَلَعَب", "مَلِعَب", "مَلُعَب"]}, {"word": "مَطْبَخ", "options": ["مَطْبَخ", "مَطَبَخ", "مَطِبَخ", "مَطُبَخ"]}, {"word": "مَغْرِب", "options": ["مَغْرِب", "مَغَرِب", "مَغِرِب", "مَغُرِب"]}, {"word": "يَحْفَظُ", "options": ["يَحْفَظُ", "يَحَفَظُ", "يَحِفَظُ", "يَحُفَظُ"]}, {"word": "يَقْرَأُ", "options": ["يَقْرَأُ", "يَقَرَأُ", "يَقِرَأُ", "يَقُرَأُ"]}, {"word": "يَطْبُخُ", "options": ["يَطْبُخُ", "يَطَبُخُ", "يَطِبُخُ", "يَطُبُخُ"]}, {"word": "مَكْتَبَة", "options": ["مَكْتَبَة", "مَكَتَبَة", "مَكِتَبَة", "مَكُتَبَة"]}, {"word": "مَرْكَب", "options": ["مَرْكَب", "مَرَكَب", "مَرِكَب", "مَرُكَب"]}];
+let i=0,score=0,answered=false;
+const opts=document.getElementById('options'), fb=document.getElementById('feedback'), next=document.getElementById('next');
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function speak(){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(questions[i].word);u.lang='ar-SA';u.rate=.72;speechSynthesis.speak(u)}
+function render(){
+ answered=false;fb.textContent='';next.style.display='none';opts.innerHTML='';
+ document.getElementById('progress').textContent=`السؤال ${i+1} من 30`;
+ document.getElementById('score').textContent=`النتيجة: ${score}`;
+ document.getElementById('fill').style.width=`${i/30*100}%`;
+ shuffle(questions[i].options).forEach(x=>{const b=document.createElement('button');b.className='opt';b.textContent=x;b.addEventListener('click',()=>choose(b,x));opts.appendChild(b)})
+}
+function choose(btn,x){
+ if(answered)return;answered=true;
+ const correct=questions[i].word;
+ [...opts.children].forEach(b=>{b.disabled=true;if(b.textContent===correct)b.classList.add('correct')});
+ if(x===correct){score++;fb.textContent='✅ أحسنت! إجابة صحيحة.'}else{btn.classList.add('wrong');fb.textContent=`❌ الإجابة الصحيحة هي: ${correct}`}
+ document.getElementById('score').textContent=`النتيجة: ${score}`;next.style.display='block';
+}
+next.addEventListener('click',()=>{i++;if(i<questions.length)render();else finish()});
+document.getElementById('listen').addEventListener('click',speak);
+function finish(){
+ document.getElementById('fill').style.width='100%';
+ const pct=Math.round(score/30*100);
+ document.getElementById('quiz').innerHTML=`<div class="end"><h2>انتهى الاختبار 🎉</h2><h1>${score} / 30</h1><p>النسبة: ${pct}%</p><button class="listen" onclick="location.reload()">إعادة الاختبار</button></div>`;
+}
+render();
+</script></body></html>
